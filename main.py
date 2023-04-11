@@ -46,11 +46,9 @@ def fetchYoutubeVideoTitles():
             # save to array
             video_titles.append(video_title)
             # print(f'{video_title}:https:www.youtube.com/watch?v={video_id}')
-        playlist_title += playlist_items['items'][0]['snippet']['title']
         next_page_token = playlist_items.get('next_page_token')
         if not next_page_token:
             break
-        return playlist_title
 
 card_id = 'a4rL2AkH'
 
@@ -111,25 +109,26 @@ def last_checklist_id(formatted_card_id):
 def addItemsToPlayList(formatted_card_id):
     create_checkitem_url = f"https://api.trello.com/1/checklists/{formatted_card_id}/checkItems"
 
-    create_checkitem_query = {
-      'name': video_titles[0],
-      'key': APIkeys.TRELLO_API_KEY,
-      'token': APIkeys.TRELLO_API_TOKEN
-    }
+    requests_list = []
 
-    response = requests.request(
-       "POST",
-       create_checkitem_url,
-       params=create_checkitem_query
-    )
+    for i in range(len(video_titles)):
+        requests_list.append({'name':video_titles[i], 'key':APIkeys.TRELLO_API_KEY,'token':APIkeys.TRELLO_API_TOKEN})
 
-    print("After adding items to playlist, response is: {0}".format(response.text))
+
+    for req in requests_list:
+        response = requests.request(
+            "POST",
+            create_checkitem_url,
+            params=req
+            )
+        # print("Response is: ".format(json.loads(response.text)))
 
 # get card id - 24 chr long
 formatted_card_id = getCardID(card_id)
 
-playlist_title = fetchYoutubeVideoTitles()
+fetchYoutubeVideoTitles()
 # create a checklist in it
+playlist_title=input("Enter a suitable title for playlist: ")
 create_checklist(formatted_card_id,playlist_title)
 
 # get id corresponding to checklist
